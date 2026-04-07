@@ -393,6 +393,61 @@ void Scheme::addConstAndEqual(Ciphertext& cipher, complex<double> cnst, long log
 }
 
 //-----------------------------------------
+Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit) {
+	ZZ q = context.qpowvec[cipher1.logq];
+	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
+
+	ZZX axbx1, axbx2, axax, bxbx, axmult, bxmult;
+	Key key = keyMap.at(MULTIPLICATION);
+
+	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
+    if(step == 0)
+        SwitchBit(axbx1[coeff], bit);
+	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
+    if(step == 1)
+        SwitchBit(axbx2[coeff], bit);
+	Ring2Utils::multAndEqual(axbx1, axbx2, q, context.N);
+    if(step == 2)
+        SwitchBit(axbx1[coeff], bit);
+
+	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
+    if(step == 3)
+        SwitchBit(axax[coeff], bit);
+	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
+    if(step == 4)
+        SwitchBit(bxbx[coeff], bit);
+
+	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
+    if(step == 5)
+        SwitchBit(axmult[coeff], bit);
+	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
+    if(step == 6)
+        SwitchBit(bxmult[coeff], bit);
+
+	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
+    if(step == 7)
+        SwitchBit(axmult[coeff], bit);
+	Ring2Utils::rightShiftAndEqual(bxmult, context.logQ, context.N);
+    if(step == 8)
+        SwitchBit(bxmult[coeff], bit);
+
+	Ring2Utils::addAndEqual(axmult, axbx1, q, context.N);
+    if(step == 9)
+        SwitchBit(axmult[coeff], bit);
+
+	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
+    if(step == 10)
+        SwitchBit(axmult[coeff], bit);
+	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
+    if(step == 11)
+        SwitchBit(axmult[coeff], bit);
+	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
+    if(step == 12)
+        SwitchBit(bxmult[coeff], bit);
+
+	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
+}
+
 
 Ciphertext Scheme::sub(Ciphertext& cipher1, Ciphertext& cipher2) {
 	ZZ q = context.qpowvec[cipher1.logq];

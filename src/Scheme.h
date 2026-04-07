@@ -228,6 +228,7 @@ public:
 	//   HOMOMORPHIC OPERATIONS
 	//----------------------------------------------------------------------------------
 
+    Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
 
 	/**
 	 * negate the ciphertext
