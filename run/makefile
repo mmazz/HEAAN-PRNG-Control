@@ -1,13 +1,17 @@
-CXX = g++
-CXXFLAGS = -std=c++11 -O2 -I../src
-LDFLAGS = -L../lib -lntl -lgmp -lm
 
-TARGET = HEAAN
-SOURCES = run.cpp
-LIB = ../lib/libHEAAN.a
+all: clean HEAAN run
 
-$(TARGET): $(SOURCES)
-	$(CXX) $(CXXFLAGS) $(SOURCES) $(LIB) $(LDFLAGS) -o $(TARGET)
+# Tool invocations
+HEAAN:
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C++ Linker'
+	g++ run.cpp -o HEAAN -L/usr/local/lib ../lib/libHEAAN.a -lntl -lgmp -lm -std=c++11 -O2 -I/../src -pthread
+	@echo 'Finished building target: $@'
+	@echo ' '
 
+# Other Targets
 clean:
-	rm -f $(TARGET)
+	rm -rf HEAAN
+
+run:
+	./HEAAN

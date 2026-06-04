@@ -12,7 +12,8 @@ using namespace std;
 using namespace NTL;
 
 int main() {
-	
+	TestScheme::testBootstrap(15, 23, 29, 620, 3, 2);
+
 	//-----------------------------------------
 
 	/*
@@ -31,7 +32,7 @@ int main() {
 	 * Params: logN, logQ, logp, isComplex
 	 * Suggested: 13, 65, 30, 3
 	 */
-	TestScheme::testBasic(13, 65, 30, 3);
+//	TestScheme::testBasic(13, 65, 30, 3);
 
 	/*
 	 * Params: logN, logQ, logp, logSlots
