@@ -32,5 +32,17 @@ Ciphertext cipher = scheme.encryptMsg(plain, seed);
 cd HEAAN/lib
 make -j$(nproc)
 
+
+## New methods
+
+In order to inject erros in the middle of the computations we add this new
+methods:
+```
+Ciphertext addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
+Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
+Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit);
+void reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit) {
+```
+
 # License
 Copyright (c) by CryptoLab inc. This program is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unported License. You should have received a copy of the license along with this work. If not, see http://creativecommons.org/licenses/by-nc/3.0/.

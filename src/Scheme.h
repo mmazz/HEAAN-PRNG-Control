@@ -250,6 +250,7 @@ public:
 	 * @return ciphertext(m1 + m2)
 	 */
 	Ciphertext add(Ciphertext& cipher1, Ciphertext& cipher2);
+    Ciphertext addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
 
 	/**
 	 * addition of ciphertexts
@@ -573,6 +574,7 @@ public:
 	 */
 	void reScaleByAndEqual(Ciphertext& cipher, long bitsDown);
 
+    void reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit);
 	/**
 	 * rescaling procedure
 	 * @param[in, out] cipher: ciphertext(m) -> ciphertext(m / 2^(logq - newlogq)) with new modulus (2^newlogq)
@@ -653,6 +655,7 @@ public:
 	 * @return ciphertext(m(v_{1+rotSlots}, v_{2+rotSlots}, ..., v_{slots+rotSlots})
 	 */
 	Ciphertext leftRotateFast(Ciphertext& cipher, long rotSlots);
+    Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit);
 
 	/**
 	 * calculates ciphertext of array with rotated indexes
