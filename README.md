@@ -40,8 +40,16 @@ methods:
 ```
 Ciphertext addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
 Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
-Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit);
 void reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit) {
+Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit);
+```
+
+These are the correspondent stages:
+```
+add_inside        up to step 5
+mult_inside       up to step 25
+rescale_inside    up to step 3
+rot_inside        up to step 11
 ```
 
 # License
