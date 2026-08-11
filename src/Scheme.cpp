@@ -416,94 +416,6 @@ void Scheme::addConstAndEqual(Ciphertext& cipher, complex<double> cnst, long log
 }
 
 //-----------------------------------------
-Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit) {
-	ZZ q = context.qpowvec[cipher1.logq];
-	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
-
-	ZZX axbx1, axbx2, axax, bxbx, axmult, bxmult;
-	Key key = keyMap.at(MULTIPLICATION);
-
-    if(step == 0)
-        SwitchBit(cipher1.ax[coeff], bit);
-    if(step == 1)
-        SwitchBit(cipher1.bx[coeff], bit);
-	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
-
-    if(step == 2)
-        SwitchBit(cipher2.ax[coeff], bit);
-    if(step == 3)
-        SwitchBit(cipher2.bx[coeff], bit);
-	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
-
-    if(step == 4)
-        SwitchBit(axbx1[coeff], bit);
-    if(step == 5)
-        SwitchBit(axbx2[coeff], bit);
-	Ring2Utils::multAndEqual(axbx1, axbx2, q, context.N);
-
-    if(step == 6)
-        SwitchBit(cipher1.ax[coeff], bit);
-    if(step == 7)
-        SwitchBit(cipher2.ax[coeff], bit);
-	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
-
-    if(step == 8)
-        SwitchBit(cipher1.bx[coeff], bit);
-    if(step == 9)
-        SwitchBit(cipher2.bx[coeff], bit);
-	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
-
-    if(step == 10)
-        SwitchBit(axax[coeff], bit);
-    if(step == 11)
-        SwitchBit(key.ax[coeff], bit);
-	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
-
-    if(step == 12)
-        SwitchBit(axax[coeff], bit);
-    if(step == 13)
-        SwitchBit(key.bx[coeff], bit);
-	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
-
-    if(step == 14)
-        SwitchBit(axmult[coeff], bit);
-	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
-
-    if(step == 15)
-        SwitchBit(bxmult[coeff], bit);
-	Ring2Utils::rightShiftAndEqual(bxmult, context.logQ, context.N);
-
-    if(step == 16)
-        SwitchBit(axmult[coeff], bit);
-    if(step == 17)
-        SwitchBit(axbx1[coeff], bit);
-	Ring2Utils::addAndEqual(axmult, axbx1, q, context.N);
-
-    if(step == 18)
-        SwitchBit(axmult[coeff], bit);
-    if(step == 19)
-        SwitchBit(bxbx[coeff], bit);
-	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
-
-    if(step == 20)
-        SwitchBit(axmult[coeff], bit);
-    if(step == 21)
-        SwitchBit(axax[coeff], bit);
-	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
-
-    if(step == 22)
-        SwitchBit(bxmult[coeff], bit);
-    if(step == 23)
-        SwitchBit(bxbx[coeff], bit);
-	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
-
-    if(step == 24)
-        SwitchBit(axmult[coeff], bit);
-    if(step == 25)
-        SwitchBit(bxmult[coeff], bit);
-
-	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
-}
 
 
 Ciphertext Scheme::sub(Ciphertext& cipher1, Ciphertext& cipher2) {
@@ -582,6 +494,99 @@ Ciphertext Scheme::mult(Ciphertext& cipher1, Ciphertext& cipher2) {
 	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
 	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
 	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
+
+	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
+}
+
+Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit) {
+	ZZ q = context.qpowvec[cipher1.logq];
+	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
+
+	ZZX axbx1, axbx2, axax, bxbx, axmult, bxmult;
+	Key key = keyMap.at(MULTIPLICATION);
+
+    if(step == 0)
+        SwitchBit(cipher1.ax[coeff], bit);
+    if(step == 1)
+        SwitchBit(cipher1.bx[coeff], bit);
+	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
+
+    if(step == 2)
+        SwitchBit(cipher2.ax[coeff], bit);
+    if(step == 3)
+        SwitchBit(cipher2.bx[coeff], bit);
+	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
+
+    if(step == 4)
+        SwitchBit(axbx1[coeff], bit);
+    if(step == 5)
+        SwitchBit(axbx2[coeff], bit);
+	Ring2Utils::multAndEqual(axbx1, axbx2, q, context.N);
+
+    if(step == 6)
+        SwitchBit(cipher1.ax[coeff], bit);
+    if(step == 7)
+        SwitchBit(cipher2.ax[coeff], bit);
+	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
+
+    if(step == 8)
+        SwitchBit(cipher1.bx[coeff], bit);
+    if(step == 9)
+        SwitchBit(cipher2.bx[coeff], bit);
+	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
+
+    if(step == 10)
+        SwitchBit(axax[coeff], bit);
+    if(step == 11)
+        SwitchBit(key.ax[coeff], bit);
+	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
+
+    if(step == 12 || step == 26)
+        SwitchBit(axax[coeff], bit);
+    if(step == 13)
+        SwitchBit(key.bx[coeff], bit);
+	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
+
+    // we un do the bit flip, so affects only once
+    if(step == 26)
+        SwitchBit(axax[coeff], bit);
+
+    if(step == 14)
+        SwitchBit(axmult[coeff], bit);
+	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
+
+    if(step == 15)
+        SwitchBit(bxmult[coeff], bit);
+	Ring2Utils::rightShiftAndEqual(bxmult, context.logQ, context.N);
+
+    if(step == 16)
+        SwitchBit(axmult[coeff], bit);
+    if(step == 17)
+        SwitchBit(axbx1[coeff], bit);
+	Ring2Utils::addAndEqual(axmult, axbx1, q, context.N);
+
+    if(step == 18)
+        SwitchBit(axmult[coeff], bit);
+    if(step == 19)
+        SwitchBit(bxbx[coeff], bit);
+	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
+
+    if(step == 20)
+        SwitchBit(axmult[coeff], bit);
+    if(step == 21)
+        SwitchBit(axax[coeff], bit);
+	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
+
+    if(step == 22)
+        SwitchBit(bxmult[coeff], bit);
+    if(step == 23)
+        SwitchBit(bxbx[coeff], bit);
+	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
+
+    if(step == 24)
+        SwitchBit(axmult[coeff], bit);
+    if(step == 25)
+        SwitchBit(bxmult[coeff], bit);
 
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
@@ -968,10 +973,11 @@ Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint
 	Ring2Utils::rightShiftAndEqual(ax, context.logQ, context.N);
 
 
-    if(step == 7)
+    if(step == 7 || step == 12)
         SwitchBit(bx[coeff], bit);
 	Ring2Utils::rightShiftAndEqual(bx, context.logQ, context.N);
-
+    if(step == 12)
+        SwitchBit(bx[coeff], bit);
     if(step == 8)
         SwitchBit(bx[coeff], bit);
     if(step == 9)
