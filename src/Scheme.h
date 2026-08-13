@@ -755,6 +755,8 @@ public:
 	 * @param[in] logI: for h = 64, logI by experiments is 4
 	 */
 	void bootstrapAndEqual(Ciphertext& cipher, long logq, long logQ, long logT, long logI = 4);
+    void bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, uint32_t step, uint32_t coeff, uint32_t bit, long logI);
+
 
 };
 

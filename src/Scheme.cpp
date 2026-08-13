@@ -1338,3 +1338,39 @@ void Scheme::bootstrapAndEqual(Ciphertext& cipher, long logq, long logQ, long lo
 	}
 	cipher.logp = logp;
 }
+
+void Scheme::bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, uint32_t step, uint32_t coeff, uint32_t bit, long logI) {
+	long logSlots = log2(cipher.slots);
+	long logp = cipher.logp;
+
+	modDownToAndEqual(cipher, logq);
+	normalizeAndEqual(cipher);
+
+	cipher.logq = logQ;
+	cipher.logp = logq + 4;
+	for (long i = logSlots; i < context.logNh; ++i) {
+		Ciphertext rot = leftRotateByPo2(cipher, i);
+		addAndEqual(cipher, rot);
+	}
+
+	if (logSlots == 0 && !cipher.isComplex) {
+			Ciphertext cconj = conjugate(cipher);
+			addAndEqual(cipher, cconj);
+			divByPo2AndEqual(cipher, context.logN); // bitDown: context.logN - logSlots
+			evalExpAndEqual(cipher, logT, logI); // bitDown: context.logN - logSlots + (logq + logI + 4) * logq + (logq + logI + 5) * logI + logT
+	} else {
+		divByPo2AndEqual(cipher, context.logNh); // bitDown: context.logNh - logSlots
+        flipIfStep(step, 0, cipher.ax, coeff, bit);
+        flipIfStep(step, 1, cipher.bx, coeff, bit);
+		coeffToSlotAndEqual(cipher);
+
+        flipIfStep(step, 2, cipher.ax, coeff, bit);
+        flipIfStep(step, 3, cipher.bx, coeff, bit);
+		evalExpAndEqual(cipher, logT, logI); // bitDown: context.logNh + (logI + logT + 5) * logq + (logI + logT + 6) * logI + logT + 1
+                                             //
+        flipIfStep(step, 4, cipher.ax, coeff, bit);
+        flipIfStep(step, 5, cipher.bx, coeff, bit);
+		slotToCoeffAndEqual(cipher);
+	}
+	cipher.logp = logp;
+}
