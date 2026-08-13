@@ -26,6 +26,9 @@ static long CONJUGATION = 2;
 
 class Scheme {
 private:
+    void flipIfStep(uint32_t step, uint32_t s, ZZX& poly, uint32_t coeff, uint32_t bit) {
+        if (step == s) SwitchBit(poly[coeff], bit);
+    }
 public:
 	Context& context;
 
