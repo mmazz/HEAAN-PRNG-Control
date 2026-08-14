@@ -1354,10 +1354,8 @@ void Scheme::bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, 
 	}
 
 	if (logSlots == 0 && !cipher.isComplex) {
-			Ciphertext cconj = conjugate(cipher);
-			addAndEqual(cipher, cconj);
-			divByPo2AndEqual(cipher, context.logN); // bitDown: context.logN - logSlots
-			evalExpAndEqual(cipher, logT, logI); // bitDown: context.logN - logSlots + (logq + logI + 4) * logq + (logq + logI + 5) * logI + logT
+        std::cout << "Error boot outside" << std::endl;
+        return;
 	} else {
         flipIfStep(step, 0, cipher.ax, coeff, bit);
         flipIfStep(step, 1, cipher.bx, coeff, bit);
