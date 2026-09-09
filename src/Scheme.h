@@ -9,6 +9,7 @@
 #define HEAAN_SCHEME_H_
 
 #include "Common.h"
+#include "FaultHook.h"
 #include "Ciphertext.h"
 #include "Context.h"
 #include "Key.h"
@@ -26,8 +27,12 @@ static long CONJUGATION = 2;
 
 class Scheme {
 private:
-    void flipIfStep(uint32_t step, uint32_t s, ZZX& poly, uint32_t coeff, uint32_t bit) {
-        if (step == s) SwitchBit(poly[coeff], bit);
+    // Todos los puntos de inyeccion internos pasan por aca, y aca por el hook.
+    // Ver src/FaultHook.h: el hook hace SetLength/normalize defensivos y deja
+    // que un framework externo cuente los flips realmente aplicados.
+    void flipIfStep(uint32_t step, uint32_t s, ZZX& poly,
+                    uint32_t coeff, uint32_t bit, uint32_t width = 1) {
+        if (step == s) heaanfi::flip(poly, coeff, bit, width, context.N);
     }
 public:
 	Context& context;
@@ -231,7 +236,7 @@ public:
 	//   HOMOMORPHIC OPERATIONS
 	//----------------------------------------------------------------------------------
 
-    Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
+    Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
 	/**
 	 * negate the ciphertext
@@ -253,7 +258,7 @@ public:
 	 * @return ciphertext(m1 + m2)
 	 */
 	Ciphertext add(Ciphertext& cipher1, Ciphertext& cipher2);
-    Ciphertext addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit);
+    Ciphertext addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
 	/**
 	 * addition of ciphertexts
@@ -577,7 +582,7 @@ public:
 	 */
 	void reScaleByAndEqual(Ciphertext& cipher, long bitsDown);
 
-    void reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit);
+    void reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 	/**
 	 * rescaling procedure
 	 * @param[in, out] cipher: ciphertext(m) -> ciphertext(m / 2^(logq - newlogq)) with new modulus (2^newlogq)
@@ -658,7 +663,7 @@ public:
 	 * @return ciphertext(m(v_{1+rotSlots}, v_{2+rotSlots}, ..., v_{slots+rotSlots})
 	 */
 	Ciphertext leftRotateFast(Ciphertext& cipher, long rotSlots);
-    Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit);
+    Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
 	/**
 	 * calculates ciphertext of array with rotated indexes
@@ -755,13 +760,13 @@ public:
 	 * @param[in] logI: for h = 64, logI by experiments is 4
 	 */
 	void bootstrapAndEqual(Ciphertext& cipher, long logq, long logQ, long logT, long logI = 4);
-    void bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit);
+    void bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
 
-    void bootstrapAndEqualBitFlip_inside(Ciphertext& cipher, long logq, long logQ, long logT, long logI, string stage, uint32_t step, uint32_t coeff, uint32_t bit) ;
-    void coeffToSlotAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit);
-    void evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit) ;
-    void slotToCoeffAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit) ;
+    void bootstrapAndEqualBitFlip_inside(Ciphertext& cipher, long logq, long logQ, long logT, long logI, string stage, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1) ;
+    void coeffToSlotAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
+    void evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1) ;
+    void slotToCoeffAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1) ;
 
 };
 

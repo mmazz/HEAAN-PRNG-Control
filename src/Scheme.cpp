@@ -315,20 +315,20 @@ void Scheme::negateAndEqual(Ciphertext& cipher) {
 	cipher.bx = -cipher.bx;
 }
 
-Ciphertext Scheme::addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit) {
+Ciphertext Scheme::addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	ZZ q = context.qpowvec[cipher1.logq];
 	ZZX ax, bx;
 
-    flipIfStep(step, 0, cipher1.ax, coeff, bit);
-    flipIfStep(step, 1, cipher2.ax, coeff, bit);
+    flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher2.ax, coeff, bit, width);
 	Ring2Utils::add(ax, cipher1.ax, cipher2.ax, q, context.N);
 
-    flipIfStep(step, 2, cipher1.bx, coeff, bit);
-    flipIfStep(step, 3, cipher2.bx, coeff, bit);
+    flipIfStep(step, 2, cipher1.bx, coeff, bit, width);
+    flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
 	Ring2Utils::add(bx, cipher1.bx, cipher2.bx, q, context.N);
 
-    flipIfStep(step, 4, ax, coeff, bit);
-    flipIfStep(step, 5, bx, coeff, bit);
+    flipIfStep(step, 4, ax, coeff, bit, width);
+    flipIfStep(step, 5, bx, coeff, bit, width);
 	return Ciphertext(ax, bx, cipher1.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
@@ -492,72 +492,72 @@ Ciphertext Scheme::mult(Ciphertext& cipher1, Ciphertext& cipher2) {
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
-Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit) {
+Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	ZZ q = context.qpowvec[cipher1.logq];
 	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
 
 	ZZX axbx1, axbx2, axax, bxbx, axmult, bxmult;
 	Key key = keyMap.at(MULTIPLICATION);
 
-    flipIfStep(step, 0, cipher1.ax, coeff, bit);
-    flipIfStep(step, 1, cipher1.bx, coeff, bit);
+    flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher1.bx, coeff, bit, width);
 	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
-    flipIfStep(step, 0, cipher1.ax, coeff, bit);
-    flipIfStep(step, 1, cipher1.bx, coeff, bit);
+    flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher1.bx, coeff, bit, width);
 
-    flipIfStep(step, 2, cipher2.ax, coeff, bit);
-    flipIfStep(step, 3, cipher2.bx, coeff, bit);
+    flipIfStep(step, 2, cipher2.ax, coeff, bit, width);
+    flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
 	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
-    flipIfStep(step, 2, cipher2.ax, coeff, bit);
-    flipIfStep(step, 3, cipher2.bx, coeff, bit);
+    flipIfStep(step, 2, cipher2.ax, coeff, bit, width);
+    flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
 
-    flipIfStep(step, 4, axbx1, coeff, bit);
-    flipIfStep(step, 5, axbx2, coeff, bit);
+    flipIfStep(step, 4, axbx1, coeff, bit, width);
+    flipIfStep(step, 5, axbx2, coeff, bit, width);
 	Ring2Utils::multAndEqual(axbx1, axbx2, q, context.N);
 
-    flipIfStep(step, 6, cipher1.ax, coeff, bit);
-    flipIfStep(step, 7, cipher2.ax, coeff, bit);
+    flipIfStep(step, 6, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 7, cipher2.ax, coeff, bit, width);
 	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
 
-    flipIfStep(step, 8, cipher1.bx, coeff, bit);
-    flipIfStep(step, 9, cipher2.bx, coeff, bit);
+    flipIfStep(step, 8, cipher1.bx, coeff, bit, width);
+    flipIfStep(step, 9, cipher2.bx, coeff, bit, width);
 	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
 
-    flipIfStep(step, 10, axax, coeff, bit);
-    flipIfStep(step, 11, key.ax, coeff, bit);
+    flipIfStep(step, 10, axax, coeff, bit, width);
+    flipIfStep(step, 11, key.ax, coeff, bit, width);
 	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
-    flipIfStep(step, 10, axax, coeff, bit);
+    flipIfStep(step, 10, axax, coeff, bit, width);
 
-    flipIfStep(step, 12, axax, coeff, bit);
-    flipIfStep(step, 13, key.bx, coeff, bit);
+    flipIfStep(step, 12, axax, coeff, bit, width);
+    flipIfStep(step, 13, key.bx, coeff, bit, width);
 	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
-    flipIfStep(step, 12, axax, coeff, bit);
+    flipIfStep(step, 12, axax, coeff, bit, width);
 
-    flipIfStep(step, 14, axmult, coeff, bit);
+    flipIfStep(step, 14, axmult, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
 
-    flipIfStep(step, 15, bxmult, coeff, bit);
+    flipIfStep(step, 15, bxmult, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(bxmult, context.logQ, context.N);
 
-    flipIfStep(step, 16, axmult, coeff, bit);
-    flipIfStep(step, 17, axbx1, coeff, bit);
+    flipIfStep(step, 16, axmult, coeff, bit, width);
+    flipIfStep(step, 17, axbx1, coeff, bit, width);
 	Ring2Utils::addAndEqual(axmult, axbx1, q, context.N);
 
-    flipIfStep(step, 18, axmult, coeff, bit);
-    flipIfStep(step, 19, bxbx, coeff, bit);
+    flipIfStep(step, 18, axmult, coeff, bit, width);
+    flipIfStep(step, 19, bxbx, coeff, bit, width);
 	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
-    flipIfStep(step, 19, bxbx, coeff, bit);
+    flipIfStep(step, 19, bxbx, coeff, bit, width);
 
-    flipIfStep(step, 20, axmult, coeff, bit);
-    flipIfStep(step, 21, axax, coeff, bit);
+    flipIfStep(step, 20, axmult, coeff, bit, width);
+    flipIfStep(step, 21, axax, coeff, bit, width);
 	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
 
-    flipIfStep(step, 22, bxmult, coeff, bit);
-    flipIfStep(step, 23, bxbx, coeff, bit);
+    flipIfStep(step, 22, bxmult, coeff, bit, width);
+    flipIfStep(step, 23, bxbx, coeff, bit, width);
 	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
 
-    flipIfStep(step, 24, axmult, coeff, bit);
-    flipIfStep(step, 25, bxmult, coeff, bit);
+    flipIfStep(step, 24, axmult, coeff, bit, width);
+    flipIfStep(step, 25, bxmult, coeff, bit, width);
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
@@ -837,17 +837,17 @@ Ciphertext Scheme::reScaleTo(Ciphertext& cipher, long newlogq) {
 	return Ciphertext(ax, bx, cipher.logp - bitsDown, newlogq, cipher.slots, cipher.isComplex);
 }
 
-void Scheme::reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 
-    flipIfStep(step, 0, cipher.ax, coeff, bit);
+    flipIfStep(step, 0, cipher.ax, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.ax, bitsDown, context.N);
 
 
-    flipIfStep(step, 1, cipher.bx, coeff, bit);
+    flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.bx, bitsDown, context.N);
 
-    flipIfStep(step, 2, cipher.ax, coeff, bit);
-    flipIfStep(step, 3, cipher.bx, coeff, bit);
+    flipIfStep(step, 2, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 3, cipher.bx, coeff, bit, width);
 	cipher.logq -= bitsDown;
 	cipher.logp -= bitsDown;
 }
@@ -910,40 +910,40 @@ void Scheme::modDownToAndEqual(Ciphertext& cipher, long logq) {
 //   ROTATIONS & CONJUGATIONS
 //----------------------------------------------------------------------------------
 
-Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit){
+Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width){
 	ZZ q = context.qpowvec[cipher.logq];
 	ZZ qQ = context.qpowvec[cipher.logq + context.logQ];
 
 	ZZX bxrot, ax, bx;
 	Key key = leftRotKeyMap.at(rotSlots);
 
-    flipIfStep(step, 0, cipher.bx, coeff, bit);
+    flipIfStep(step, 0, cipher.bx, coeff, bit, width);
 	Ring2Utils::inpower(bxrot, cipher.bx, context.rotGroup[rotSlots], context.Q, context.N);
 
-    flipIfStep(step, 1, cipher.ax, coeff, bit);
+    flipIfStep(step, 1, cipher.ax, coeff, bit, width);
 	Ring2Utils::inpower(bx, cipher.ax, context.rotGroup[rotSlots], context.Q, context.N);
 
-    flipIfStep(step, 2, bx, coeff, bit);
-    flipIfStep(step, 3, key.ax, coeff, bit);
+    flipIfStep(step, 2, bx, coeff, bit, width);
+    flipIfStep(step, 3, key.ax, coeff, bit, width);
 	Ring2Utils::mult(ax, bx, key.ax, qQ, context.N);
-    flipIfStep(step, 2, bx, coeff, bit);
+    flipIfStep(step, 2, bx, coeff, bit, width);
 
-    flipIfStep(step, 4, bx, coeff, bit);
-    flipIfStep(step, 5, key.bx, coeff, bit);
+    flipIfStep(step, 4, bx, coeff, bit, width);
+    flipIfStep(step, 5, key.bx, coeff, bit, width);
 	Ring2Utils::multAndEqual(bx, key.bx, qQ, context.N);
 
-    flipIfStep(step, 6, ax, coeff, bit);
+    flipIfStep(step, 6, ax, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(ax, context.logQ, context.N);
 
-    flipIfStep(step, 7, bx, coeff, bit);
+    flipIfStep(step, 7, bx, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(bx, context.logQ, context.N);
 
-    flipIfStep(step, 8, bx, coeff, bit);
-    flipIfStep(step, 9, bxrot, coeff, bit);
+    flipIfStep(step, 8, bx, coeff, bit, width);
+    flipIfStep(step, 9, bxrot, coeff, bit, width);
 	Ring2Utils::addAndEqual(bx, bxrot, q, context.N);
 
-    flipIfStep(step, 10, bx, coeff, bit);
-    flipIfStep(step, 11, ax, coeff, bit);
+    flipIfStep(step, 10, bx, coeff, bit, width);
+    flipIfStep(step, 11, ax, coeff, bit, width);
 	return Ciphertext(ax, bx, cipher.logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
@@ -1339,7 +1339,7 @@ void Scheme::bootstrapAndEqual(Ciphertext& cipher, long logq, long logQ, long lo
 	cipher.logp = logp;
 }
 
-void Scheme::bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	long logSlots = log2(cipher.slots);
 	long logp = cipher.logp;
 
@@ -1357,26 +1357,26 @@ void Scheme::bootstrapAndEqualBitFlip(Ciphertext& cipher, long logq, long logQ, 
         std::cout << "Error boot outside" << std::endl;
         return;
 	} else {
-        flipIfStep(step, 0, cipher.ax, coeff, bit);
-        flipIfStep(step, 1, cipher.bx, coeff, bit);
+        flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 1, cipher.bx, coeff, bit, width);
         divByPo2AndEqual(cipher, context.logNh); // bitDown: context.logNh - logSlots
 
-        flipIfStep(step, 2, cipher.ax, coeff, bit);
-        flipIfStep(step, 3, cipher.bx, coeff, bit);
+        flipIfStep(step, 2, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 3, cipher.bx, coeff, bit, width);
         coeffToSlotAndEqual(cipher);
                                              //
-        flipIfStep(step, 4, cipher.ax, coeff, bit);
-        flipIfStep(step, 5, cipher.bx, coeff, bit);
+        flipIfStep(step, 4, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 5, cipher.bx, coeff, bit, width);
         evalExpAndEqual(cipher, logT, logI); // bitDown: context.logNh + (logI + logT + 5) * logq + (logI + logT + 6) * logI + logT + 1
                                              //
-        flipIfStep(step, 6, cipher.ax, coeff, bit);
-        flipIfStep(step, 7, cipher.bx, coeff, bit);
+        flipIfStep(step, 6, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 7, cipher.bx, coeff, bit, width);
         slotToCoeffAndEqual(cipher);
 	}
 	cipher.logp = logp;
 }
 
-void Scheme::coeffToSlotAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::coeffToSlotAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	long slots = cipher.slots;
 	long logSlots = log2(slots);
 	long logk = logSlots / 2;
@@ -1419,14 +1419,14 @@ void Scheme::coeffToSlotAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint3
 		leftRotateAndEqualFast(tmpvec[0], ki);
 		addAndEqual(cipher, tmpvec[0]);
 	}
-    flipIfStep(step, 0, cipher.ax, coeff, bit);
-    flipIfStep(step, 1, cipher.bx, coeff, bit);
+    flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 	reScaleByAndEqual(cipher, bootContext.logp);
 	delete[] rotvec;
 	delete[] tmpvec;
 }
 
-void Scheme::slotToCoeffAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::slotToCoeffAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	long slots = cipher.slots;
 	long logSlots = log2(slots);
 	long logk = logSlots / 2;
@@ -1471,28 +1471,28 @@ void Scheme::slotToCoeffAndEqualBitFlip(Ciphertext& cipher, uint32_t step, uint3
 		leftRotateAndEqualFast(tmpvec[0], ki);
 		addAndEqual(cipher, tmpvec[0]);
 	}
-    flipIfStep(step, 0, cipher.ax, coeff, bit);
-    flipIfStep(step, 1, cipher.bx, coeff, bit);
+    flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 	reScaleByAndEqual(cipher, bootContext.logp);
 	delete[] rotvec;
 	delete[] tmpvec;
 }
-void Scheme::evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	long slots = cipher.slots;
 	long logSlots = log2(slots);
 	BootContext bootContext = context.bootContextMap.at(logSlots);
     if(logSlots < context.logNh) {
 		Ciphertext tmp = conjugate(cipher);
-        flipIfStep(step, 0, cipher.ax, coeff, bit);
-        flipIfStep(step, 1, cipher.bx, coeff, bit);
+        flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 		subAndEqual(cipher, tmp);
 
-        flipIfStep(step, 2, cipher.ax, coeff, bit);
-        flipIfStep(step, 3, cipher.bx, coeff, bit);
+        flipIfStep(step, 2, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 3, cipher.bx, coeff, bit, width);
 		divByPo2AndEqual(cipher, logT + 1); // bitDown: logT + 1
 
-        flipIfStep(step, 4, cipher.ax, coeff, bit);
-        flipIfStep(step, 5, cipher.bx, coeff, bit);
+        flipIfStep(step, 4, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 5, cipher.bx, coeff, bit, width);
 		exp2piAndEqual(cipher, bootContext.logp); // bitDown: logT + 1 + 3(logq + logI)
 		for (long i = 0; i < logI + logT; ++i) {
 			squareAndEqual(cipher);
@@ -1500,21 +1500,21 @@ void Scheme::evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, ui
 		}
 		tmp = conjugate(cipher);
 
-        flipIfStep(step, 6, cipher.ax, coeff, bit);
-        flipIfStep(step, 7, cipher.bx, coeff, bit);
+        flipIfStep(step, 6, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 7, cipher.bx, coeff, bit, width);
 		subAndEqual(cipher, tmp);
 
-        flipIfStep(step, 8, cipher.ax, coeff, bit);
-        flipIfStep(step, 9, cipher.bx, coeff, bit);
+        flipIfStep(step, 8, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 9, cipher.bx, coeff, bit, width);
 		tmp = multByPoly(cipher, bootContext.p1, bootContext.logp);
-        flipIfStep(step, 10, cipher.ax, coeff, bit);
-        flipIfStep(step, 11, cipher.bx, coeff, bit);
+        flipIfStep(step, 10, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 11, cipher.bx, coeff, bit, width);
 
 		Ciphertext tmprot = leftRotateFast(tmp, slots);
 		addAndEqual(tmp, tmprot);
 
-        flipIfStep(step, 12, cipher.ax, coeff, bit);
-        flipIfStep(step, 13, cipher.bx, coeff, bit);
+        flipIfStep(step, 12, cipher.ax, coeff, bit, width);
+        flipIfStep(step, 13, cipher.bx, coeff, bit, width);
 		multByPolyAndEqual(cipher, bootContext.p2, bootContext.logp);
 		tmprot = leftRotateFast(cipher, slots);
 		addAndEqual(cipher, tmprot);
@@ -1524,14 +1524,14 @@ void Scheme::evalExpAndEqualBitFlip(Ciphertext& cipher, long logT, long logI, ui
         std::cout << "Error en boot " << std::endl;
         return;
 	}
-    flipIfStep(step, 14, cipher.ax, coeff, bit);
-    flipIfStep(step, 15, cipher.bx, coeff, bit);
+    flipIfStep(step, 14, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 15, cipher.bx, coeff, bit, width);
 	reScaleByAndEqual(cipher, bootContext.logp + logI);
 	// if (logSlots == 0 && !cipher.isComplex) bitDown: logT + 3(logq + logI) + (logI + logT)(logq + logI) + logq + 2logI
 	// else bitDown: logT + 1 + 3(logq + logI) + (logI + logT)(logq + logI) + logq + 2logI
 }
 
-void Scheme::bootstrapAndEqualBitFlip_inside(Ciphertext& cipher, long logq, long logQ, long logT, long logI, string stage, uint32_t step, uint32_t coeff, uint32_t bit) {
+void Scheme::bootstrapAndEqualBitFlip_inside(Ciphertext& cipher, long logq, long logQ, long logT, long logI, string stage, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	long logSlots = log2(cipher.slots);
 	long logp = cipher.logp;
 
@@ -1552,17 +1552,17 @@ void Scheme::bootstrapAndEqualBitFlip_inside(Ciphertext& cipher, long logq, long
         divByPo2AndEqual(cipher, context.logNh); // bitDown: context.logNh - logSlots
 
         if(stage=="boot_coeff")
-            coeffToSlotAndEqualBitFlip(cipher, step, coeff, bit);
+            coeffToSlotAndEqualBitFlip(cipher, step, coeff, bit, width);
         else
             coeffToSlotAndEqual(cipher);
 
         if(stage=="boot_eval")
-            evalExpAndEqualBitFlip(cipher, logT, logI, step, coeff, bit); // bitDown: context.logNh + (logI + logT + 5) * logq + (logI + logT + 6) * logI + logT + 1
+            evalExpAndEqualBitFlip(cipher, logT, logI, step, coeff, bit, width); // bitDown: context.logNh + (logI + logT + 5) * logq + (logI + logT + 6) * logI + logT + 1
         else
             evalExpAndEqual(cipher, logT, logI); // bitDown: context.logNh + (logI + logT + 5) * logq + (logI + logT + 6) * logI + logT + 1
                                              //
         if(stage=="boot_slot")
-            slotToCoeffAndEqualBitFlip(cipher, step, coeff, bit);
+            slotToCoeffAndEqualBitFlip(cipher, step, coeff, bit, width);
         else
             slotToCoeffAndEqual(cipher);
 	}
