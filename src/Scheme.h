@@ -238,7 +238,7 @@ public:
 
     Ciphertext multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
-    Ciphertext multBitFlipAsplos(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width);
+    Ciphertext multBitFlipAsplos(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 	/**
 	 * negate the ciphertext
 	 * @param[in] cipher: ciphertext(m)
@@ -666,7 +666,7 @@ public:
 	Ciphertext leftRotateFast(Ciphertext& cipher, long rotSlots);
     Ciphertext leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 
-    Ciphertext leftRotateFastBitFlipAsplos(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width);
+    Ciphertext leftRotateFastBitFlipAsplos(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width = 1);
 	/**
 	 * calculates ciphertext of array with rotated indexes
 	 * @param[in, out] cipher: ciphertext(m(v_1, v_2, ..., v_slots)) -> cipher(m(v_{1+rotSlots}, v_{2+rotSlots}, ..., v_{slots+rotSlots})
