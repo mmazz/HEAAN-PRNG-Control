@@ -492,6 +492,68 @@ Ciphertext Scheme::mult(Ciphertext& cipher1, Ciphertext& cipher2) {
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
+Ciphertext Scheme::multBitFlipAsplos(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
+	ZZ q = context.qpowvec[cipher1.logq];
+	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
+
+	ZZX axbx1, axbx2, axax, bxbx, axmult, bxmult;
+	Key key = keyMap.at(MULTIPLICATION);
+
+    flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 1, cipher1.bx, coeff, bit, width);
+	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
+
+    flipIfStep(step, 2, cipher2.ax, coeff, bit, width);
+    flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
+	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
+
+    flipIfStep(step, 4, axbx1, coeff, bit, width);
+    flipIfStep(step, 5, axbx2, coeff, bit, width);
+	Ring2Utils::multAndEqual(axbx1, axbx2, q, context.N);
+
+    flipIfStep(step, 6, cipher1.ax, coeff, bit, width);
+    flipIfStep(step, 7, cipher2.ax, coeff, bit, width);
+	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
+
+    flipIfStep(step, 8, cipher1.bx, coeff, bit, width);
+    flipIfStep(step, 9, cipher2.bx, coeff, bit, width);
+	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
+
+    flipIfStep(step, 10, axax, coeff, bit, width);
+    flipIfStep(step, 11, key.ax, coeff, bit, width);
+	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
+
+    flipIfStep(step, 12, axax, coeff, bit, width);
+    flipIfStep(step, 13, key.bx, coeff, bit, width);
+	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
+
+    flipIfStep(step, 14, axmult, coeff, bit, width);
+	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
+
+    flipIfStep(step, 15, bxmult, coeff, bit, width);
+	Ring2Utils::rightShiftAndEqual(bxmult, context.logQ, context.N);
+
+    flipIfStep(step, 16, axmult, coeff, bit, width);
+    flipIfStep(step, 17, axbx1, coeff, bit, width);
+	Ring2Utils::addAndEqual(axmult, axbx1, q, context.N);
+
+    flipIfStep(step, 18, axmult, coeff, bit, width);
+    flipIfStep(step, 19, bxbx, coeff, bit, width);
+	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
+
+    flipIfStep(step, 20, axmult, coeff, bit, width);
+    flipIfStep(step, 21, axax, coeff, bit, width);
+	Ring2Utils::subAndEqual(axmult, axax, q, context.N);
+
+    flipIfStep(step, 22, bxmult, coeff, bit, width);
+    flipIfStep(step, 23, bxbx, coeff, bit, width);
+	Ring2Utils::addAndEqual(bxmult, bxbx, q, context.N);
+
+    flipIfStep(step, 24, axmult, coeff, bit, width);
+    flipIfStep(step, 25, bxmult, coeff, bit, width);
+	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
+}
+
 Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	ZZ q = context.qpowvec[cipher1.logq];
 	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
@@ -947,6 +1009,41 @@ Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint
 	return Ciphertext(ax, bx, cipher.logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
+Ciphertext Scheme::leftRotateFastBitFlipAsplos(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width){
+	ZZ q = context.qpowvec[cipher.logq];
+	ZZ qQ = context.qpowvec[cipher.logq + context.logQ];
+
+	ZZX bxrot, ax, bx;
+	Key key = leftRotKeyMap.at(rotSlots);
+
+    flipIfStep(step, 0, cipher.bx, coeff, bit, width);
+	Ring2Utils::inpower(bxrot, cipher.bx, context.rotGroup[rotSlots], context.Q, context.N);
+
+    flipIfStep(step, 1, cipher.ax, coeff, bit, width);
+	Ring2Utils::inpower(bx, cipher.ax, context.rotGroup[rotSlots], context.Q, context.N);
+
+    flipIfStep(step, 2, bx, coeff, bit, width);
+    flipIfStep(step, 3, key.ax, coeff, bit, width);
+	Ring2Utils::mult(ax, bx, key.ax, qQ, context.N);
+
+    flipIfStep(step, 4, bx, coeff, bit, width);
+    flipIfStep(step, 5, key.bx, coeff, bit, width);
+	Ring2Utils::multAndEqual(bx, key.bx, qQ, context.N);
+
+    flipIfStep(step, 6, ax, coeff, bit, width);
+	Ring2Utils::rightShiftAndEqual(ax, context.logQ, context.N);
+
+    flipIfStep(step, 7, bx, coeff, bit, width);
+	Ring2Utils::rightShiftAndEqual(bx, context.logQ, context.N);
+
+    flipIfStep(step, 8, bx, coeff, bit, width);
+    flipIfStep(step, 9, bxrot, coeff, bit, width);
+	Ring2Utils::addAndEqual(bx, bxrot, q, context.N);
+
+    flipIfStep(step, 10, bx, coeff, bit, width);
+    flipIfStep(step, 11, ax, coeff, bit, width);
+	return Ciphertext(ax, bx, cipher.logp, cipher.logq, cipher.slots, cipher.isComplex);
+}
 Ciphertext Scheme::leftRotateFast(Ciphertext& cipher, long rotSlots) {
 	ZZ q = context.qpowvec[cipher.logq];
 	ZZ qQ = context.qpowvec[cipher.logq + context.logQ];
