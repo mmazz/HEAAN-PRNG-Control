@@ -27,12 +27,13 @@ static long CONJUGATION = 2;
 
 class Scheme {
 private:
-    // Todos los puntos de inyeccion internos pasan por aca, y aca por el hook.
-    // Ver src/FaultHook.h: el hook hace SetLength/normalize defensivos y deja
-    // que un framework externo cuente los flips realmente aplicados.
     void flipIfStep(uint32_t step, uint32_t s, ZZX& poly,
                     uint32_t coeff, uint32_t bit, uint32_t width = 1) {
         if (step == s) heaanfi::flip(poly, coeff, bit, width, context.N);
+    }
+    void restoreIfStep(uint32_t step, uint32_t s, ZZX& poly,
+                       uint32_t coeff, uint32_t bit, uint32_t width = 1) {
+        flipIfStep(step, s, poly, coeff, bit, width);
     }
 public:
 	Context& context;

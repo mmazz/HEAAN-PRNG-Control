@@ -322,10 +322,14 @@ Ciphertext Scheme::addBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t
     flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
     flipIfStep(step, 1, cipher2.ax, coeff, bit, width);
 	Ring2Utils::add(ax, cipher1.ax, cipher2.ax, q, context.N);
+    restoreIfStep(step, 0, cipher1.ax, coeff, bit, width);  
+    restoreIfStep(step, 1, cipher2.ax, coeff, bit, width);  
 
     flipIfStep(step, 2, cipher1.bx, coeff, bit, width);
     flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
 	Ring2Utils::add(bx, cipher1.bx, cipher2.bx, q, context.N);
+    restoreIfStep(step, 2, cipher1.bx, coeff, bit, width);  
+    restoreIfStep(step, 3, cipher2.bx, coeff, bit, width);
 
     flipIfStep(step, 4, ax, coeff, bit, width);
     flipIfStep(step, 5, bx, coeff, bit, width);
@@ -564,14 +568,15 @@ Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_
     flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
     flipIfStep(step, 1, cipher1.bx, coeff, bit, width);
 	Ring2Utils::add(axbx1, cipher1.ax, cipher1.bx, q, context.N);
-    flipIfStep(step, 0, cipher1.ax, coeff, bit, width);
-    flipIfStep(step, 1, cipher1.bx, coeff, bit, width);
+    restoreIfStep(step, 0, cipher1.ax, coeff, bit, width);   
+    restoreIfStep(step, 1, cipher1.bx, coeff, bit, width);
 
     flipIfStep(step, 2, cipher2.ax, coeff, bit, width);
     flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
 	Ring2Utils::add(axbx2, cipher2.ax, cipher2.bx, q, context.N);
-    flipIfStep(step, 2, cipher2.ax, coeff, bit, width);
-    flipIfStep(step, 3, cipher2.bx, coeff, bit, width);
+    restoreIfStep(step, 2, cipher2.ax, coeff, bit, width);   
+    restoreIfStep(step, 3, cipher2.bx, coeff, bit, width);
+
 
     flipIfStep(step, 4, axbx1, coeff, bit, width);
     flipIfStep(step, 5, axbx2, coeff, bit, width);
@@ -580,20 +585,24 @@ Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_
     flipIfStep(step, 6, cipher1.ax, coeff, bit, width);
     flipIfStep(step, 7, cipher2.ax, coeff, bit, width);
 	Ring2Utils::mult(axax, cipher1.ax, cipher2.ax, q, context.N);
+    restoreIfStep(step, 6, cipher1.ax, coeff, bit, width);  
+    restoreIfStep(step, 7, cipher2.ax, coeff, bit, width);
 
     flipIfStep(step, 8, cipher1.bx, coeff, bit, width);
     flipIfStep(step, 9, cipher2.bx, coeff, bit, width);
 	Ring2Utils::mult(bxbx, cipher1.bx, cipher2.bx, q, context.N);
+    restoreIfStep(step, 8, cipher1.bx, coeff, bit, width); 
+    restoreIfStep(step, 9, cipher2.bx, coeff, bit, width);
 
     flipIfStep(step, 10, axax, coeff, bit, width);
     flipIfStep(step, 11, key.ax, coeff, bit, width);
 	Ring2Utils::mult(axmult, axax, key.ax, qQ, context.N);
-    flipIfStep(step, 10, axax, coeff, bit, width);
+    restoreIfStep(step, 10, axax, coeff, bit, width); 
 
     flipIfStep(step, 12, axax, coeff, bit, width);
     flipIfStep(step, 13, key.bx, coeff, bit, width);
 	Ring2Utils::mult(bxmult, axax, key.bx, qQ, context.N);
-    flipIfStep(step, 12, axax, coeff, bit, width);
+    restoreIfStep(step, 12, axax, coeff, bit, width); 
 
     flipIfStep(step, 14, axmult, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(axmult, context.logQ, context.N);
@@ -981,14 +990,16 @@ Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint
 
     flipIfStep(step, 0, cipher.bx, coeff, bit, width);
 	Ring2Utils::inpower(bxrot, cipher.bx, context.rotGroup[rotSlots], context.Q, context.N);
+    restoreIfStep(step, 0, cipher.bx, coeff, bit, width); 
 
     flipIfStep(step, 1, cipher.ax, coeff, bit, width);
 	Ring2Utils::inpower(bx, cipher.ax, context.rotGroup[rotSlots], context.Q, context.N);
+    restoreIfStep(step, 1, cipher.ax, coeff, bit, width);  
 
     flipIfStep(step, 2, bx, coeff, bit, width);
     flipIfStep(step, 3, key.ax, coeff, bit, width);
 	Ring2Utils::mult(ax, bx, key.ax, qQ, context.N);
-    flipIfStep(step, 2, bx, coeff, bit, width);
+    restoreIfStep(step, 2, bx, coeff, bit, width);  
 
     flipIfStep(step, 4, bx, coeff, bit, width);
     flipIfStep(step, 5, key.bx, coeff, bit, width);

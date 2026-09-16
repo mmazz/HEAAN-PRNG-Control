@@ -3,7 +3,7 @@
 all: lib run
 
 lib:
-	$(MAKE) -C lib
+	$(MAKE) -C lib all
 
 run:
 	$(MAKE) -C run
