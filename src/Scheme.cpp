@@ -617,7 +617,7 @@ Ciphertext Scheme::multBitFlip(Ciphertext& cipher1, Ciphertext& cipher2, uint32_
     flipIfStep(step, 18, axmult, coeff, bit, width);
     flipIfStep(step, 19, bxbx, coeff, bit, width);
 	Ring2Utils::subAndEqual(axmult, bxbx, q, context.N);
-    flipIfStep(step, 19, bxbx, coeff, bit, width);
+    restoreIfStep(step, 19, bxbx, coeff, bit, width); 
 
     flipIfStep(step, 20, axmult, coeff, bit, width);
     flipIfStep(step, 21, axax, coeff, bit, width);
