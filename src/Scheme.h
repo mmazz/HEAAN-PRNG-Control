@@ -496,6 +496,7 @@ public:
 	 */
 	Ciphertext multByPoly(Ciphertext& cipher, ZZX& poly, long logp);
 
+    Ciphertext multByPolyBitFlip(Ciphertext& cipher, ZZX& poly, long logp, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width);
 	/**
 	 * polynomial multiplication
 	 * @param[in] cipher: ciphertext(m) -> ciphertext(m * cnst)

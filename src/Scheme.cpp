@@ -820,6 +820,20 @@ Ciphertext Scheme::multByPoly(Ciphertext& cipher, ZZX& poly, long logp) {
 	return Ciphertext(ax, bx, cipher.logp + logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
+Ciphertext Scheme::multByPolyBitFlip(Ciphertext& cipher, ZZX& poly, long logp, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
+	ZZ q = context.qpowvec[cipher.logq];
+	ZZX ax, bx;
+
+    flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+	Ring2Utils::mult(ax, cipher.ax, poly, q, context.N);
+
+    flipIfStep(step, 1, cipher.ax, coeff, bit, width);
+	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
+
+	return Ciphertext(ax, bx, cipher.logp + logp, cipher.logq, cipher.slots, cipher.isComplex);
+}
+
+
 void Scheme::multByPolyAndEqual(Ciphertext& cipher, ZZX& poly, long logp) {
 	ZZ q = context.qpowvec[cipher.logq];
 
