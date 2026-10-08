@@ -825,11 +825,17 @@ Ciphertext Scheme::multByPolyBitFlip(Ciphertext& cipher, ZZX& poly, long logp, u
 	ZZX ax, bx;
 
     flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 1, poly, coeff, bit, width);
 	Ring2Utils::mult(ax, cipher.ax, poly, q, context.N);
+    restoreIfStep(step, 1, poly, coeff, bit, width);  
 
-    flipIfStep(step, 1, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 2, cipher.bx, coeff, bit, width);
+    flipIfStep(step, 3, poly, coeff, bit, width);
 	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
+    restoreIfStep(step, 3, poly, coeff, bit, width);  
 
+    flipIfStep(step, 4, ax, coeff, bit, width);
+    flipIfStep(step, 5, bx, coeff, bit, width);
 	return Ciphertext(ax, bx, cipher.logp + logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
