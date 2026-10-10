@@ -555,6 +555,13 @@ Ciphertext Scheme::multBitFlipNonTransient(Ciphertext& cipher1, Ciphertext& ciph
 
     flipIfStep(step, 24, axmult, coeff, bit, width);
     flipIfStep(step, 25, bxmult, coeff, bit, width);
+
+    restoreIfStep(step, 0, cipher1.ax, coeff, bit, width);   
+    restoreIfStep(step, 1, cipher1.bx, coeff, bit, width);
+    restoreIfStep(step, 2, cipher2.ax, coeff, bit, width);   
+    restoreIfStep(step, 3, cipher2.bx, coeff, bit, width);
+    restoreIfStep(step, 11, key.ax, coeff, bit, width);
+    restoreIfStep(step, 13, key.bx, coeff, bit, width);
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
@@ -852,11 +859,13 @@ Ciphertext Scheme::multByPolyBitFlipNonTransient(Ciphertext& cipher, ZZX& poly, 
     flipIfStep(step, 2, cipher.bx, coeff, bit, width);
     flipIfStep(step, 3, poly, coeff, bit, width);
 	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
-    restoreIfStep(step, 2, cipher.bx, coeff, bit, width);  
-    restoreIfStep(step, 3, poly, coeff, bit, width);  
+
+
 
     restoreIfStep(step, 0, cipher.ax, coeff, bit, width);  
     restoreIfStep(step, 1, poly, coeff, bit, width);  
+    restoreIfStep(step, 2, cipher.bx, coeff, bit, width);  
+    restoreIfStep(step, 3, poly, coeff, bit, width);  
 
 
     flipIfStep(step, 4, ax, coeff, bit, width);
@@ -1101,6 +1110,12 @@ Ciphertext Scheme::leftRotateFastBitFlipNonTransient(Ciphertext& cipher, long ro
 
     flipIfStep(step, 10, bx, coeff, bit, width);
     flipIfStep(step, 11, ax, coeff, bit, width);
+
+
+    restoreIfStep(step, 0, cipher.bx, coeff, bit, width);  
+    restoreIfStep(step, 1, cipher.ax, coeff, bit, width);  
+    restoreIfStep(step, 3, key.ax, coeff, bit, width);  
+    restoreIfStep(step, 5, key.bx, coeff, bit, width);  
 	return Ciphertext(ax, bx, cipher.logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 Ciphertext Scheme::leftRotateFast(Ciphertext& cipher, long rotSlots) {
