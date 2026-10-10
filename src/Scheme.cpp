@@ -496,7 +496,7 @@ Ciphertext Scheme::mult(Ciphertext& cipher1, Ciphertext& cipher2) {
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
 }
 
-Ciphertext Scheme::multBitFlipAsplos(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
+Ciphertext Scheme::multBitFlipNonTransient(Ciphertext& cipher1, Ciphertext& cipher2, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
 	ZZ q = context.qpowvec[cipher1.logq];
 	ZZ qQ = context.qpowvec[cipher1.logq + context.logQ];
 
@@ -839,7 +839,22 @@ Ciphertext Scheme::multByPolyBitFlip(Ciphertext& cipher, ZZX& poly, long logp, u
 	return Ciphertext(ax, bx, cipher.logp + logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
+Ciphertext Scheme::multByPolyBitFlipNonTransient(Ciphertext& cipher, ZZX& poly, long logp, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width) {
+	ZZ q = context.qpowvec[cipher.logq];
+	ZZX ax, bx;
 
+    flipIfStep(step, 0, cipher.ax, coeff, bit, width);
+    flipIfStep(step, 1, poly, coeff, bit, width);
+	Ring2Utils::mult(ax, cipher.ax, poly, q, context.N);
+
+    flipIfStep(step, 2, cipher.bx, coeff, bit, width);
+    flipIfStep(step, 3, poly, coeff, bit, width);
+	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
+
+    flipIfStep(step, 4, ax, coeff, bit, width);
+    flipIfStep(step, 5, bx, coeff, bit, width);
+	return Ciphertext(ax, bx, cipher.logp + logp, cipher.logq, cipher.slots, cipher.isComplex);
+}
 void Scheme::multByPolyAndEqual(Ciphertext& cipher, ZZX& poly, long logp) {
 	ZZ q = context.qpowvec[cipher.logq];
 
@@ -1040,7 +1055,7 @@ Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint
 	return Ciphertext(ax, bx, cipher.logp, cipher.logq, cipher.slots, cipher.isComplex);
 }
 
-Ciphertext Scheme::leftRotateFastBitFlipAsplos(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width){
+Ciphertext Scheme::leftRotateFastBitFlipNonTransient(Ciphertext& cipher, long rotSlots, uint32_t step, uint32_t coeff, uint32_t bit, uint32_t width){
 	ZZ q = context.qpowvec[cipher.logq];
 	ZZ qQ = context.qpowvec[cipher.logq + context.logQ];
 
