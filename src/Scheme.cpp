@@ -827,11 +827,13 @@ Ciphertext Scheme::multByPolyBitFlip(Ciphertext& cipher, ZZX& poly, long logp, u
     flipIfStep(step, 0, cipher.ax, coeff, bit, width);
     flipIfStep(step, 1, poly, coeff, bit, width);
 	Ring2Utils::mult(ax, cipher.ax, poly, q, context.N);
+    restoreIfStep(step, 0, cipher.ax, coeff, bit, width);  
     restoreIfStep(step, 1, poly, coeff, bit, width);  
 
     flipIfStep(step, 2, cipher.bx, coeff, bit, width);
     flipIfStep(step, 3, poly, coeff, bit, width);
 	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
+    restoreIfStep(step, 2, cipher.bx, coeff, bit, width);  
     restoreIfStep(step, 3, poly, coeff, bit, width);  
 
     flipIfStep(step, 4, ax, coeff, bit, width);
@@ -850,6 +852,12 @@ Ciphertext Scheme::multByPolyBitFlipNonTransient(Ciphertext& cipher, ZZX& poly, 
     flipIfStep(step, 2, cipher.bx, coeff, bit, width);
     flipIfStep(step, 3, poly, coeff, bit, width);
 	Ring2Utils::mult(bx, cipher.bx, poly, q, context.N);
+    restoreIfStep(step, 2, cipher.bx, coeff, bit, width);  
+    restoreIfStep(step, 3, poly, coeff, bit, width);  
+
+    restoreIfStep(step, 0, cipher.ax, coeff, bit, width);  
+    restoreIfStep(step, 1, poly, coeff, bit, width);  
+
 
     flipIfStep(step, 4, ax, coeff, bit, width);
     flipIfStep(step, 5, bx, coeff, bit, width);
@@ -947,10 +955,13 @@ void Scheme::reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_
 
     flipIfStep(step, 0, cipher.ax, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.ax, bitsDown, context.N);
+    restoreIfStep(step, 0, cipher.ax, coeff, bit, width);  
 
 
     flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.bx, bitsDown, context.N);
+    restoreIfStep(step, 1, cipher.bx, coeff, bit, width);  
+
 
     flipIfStep(step, 2, cipher.ax, coeff, bit, width);
     flipIfStep(step, 3, cipher.bx, coeff, bit, width);
@@ -1035,10 +1046,12 @@ Ciphertext Scheme::leftRotateFastBitFlip(Ciphertext& cipher, long rotSlots, uint
     flipIfStep(step, 3, key.ax, coeff, bit, width);
 	Ring2Utils::mult(ax, bx, key.ax, qQ, context.N);
     restoreIfStep(step, 2, bx, coeff, bit, width);  
+    restoreIfStep(step, 3, key.ax, coeff, bit, width);  
 
     flipIfStep(step, 4, bx, coeff, bit, width);
     flipIfStep(step, 5, key.bx, coeff, bit, width);
 	Ring2Utils::multAndEqual(bx, key.bx, qQ, context.N);
+    restoreIfStep(step, 5, key.bx, coeff, bit, width);  
 
     flipIfStep(step, 6, ax, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(ax, context.logQ, context.N);
