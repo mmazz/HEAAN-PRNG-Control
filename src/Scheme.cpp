@@ -560,6 +560,10 @@ Ciphertext Scheme::multBitFlipNonTransient(Ciphertext& cipher1, Ciphertext& ciph
     restoreIfStep(step, 1, cipher1.bx, coeff, bit, width);
     restoreIfStep(step, 2, cipher2.ax, coeff, bit, width);   
     restoreIfStep(step, 3, cipher2.bx, coeff, bit, width);
+    restoreIfStep(step, 6, cipher1.ax, coeff, bit, width);
+    restoreIfStep(step, 7, cipher2.ax, coeff, bit, width);
+    restoreIfStep(step, 8, cipher1.bx, coeff, bit, width);
+    restoreIfStep(step, 9, cipher2.bx, coeff, bit, width);
     restoreIfStep(step, 11, key.ax, coeff, bit, width);
     restoreIfStep(step, 13, key.bx, coeff, bit, width);
 	return Ciphertext(axmult, bxmult, cipher1.logp + cipher2.logp, cipher1.logq, cipher1.slots, cipher1.isComplex);
@@ -964,13 +968,10 @@ void Scheme::reScaleByAndEqualBitFlip(Ciphertext& cipher, long bitsDown, uint32_
 
     flipIfStep(step, 0, cipher.ax, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.ax, bitsDown, context.N);
-    restoreIfStep(step, 0, cipher.ax, coeff, bit, width);  
 
 
     flipIfStep(step, 1, cipher.bx, coeff, bit, width);
 	Ring2Utils::rightShiftAndEqual(cipher.bx, bitsDown, context.N);
-    restoreIfStep(step, 1, cipher.bx, coeff, bit, width);  
-
 
     flipIfStep(step, 2, cipher.ax, coeff, bit, width);
     flipIfStep(step, 3, cipher.bx, coeff, bit, width);
